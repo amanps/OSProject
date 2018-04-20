@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 public class Restaurant {
 
-    private static Object mutex = new Object();
-
     private static Restaurant mInstance;
+
+    private int diners;
+    private int cooks;
+    private int tables;
 
     private Machine burgerMachine;
     private Machine friesMachine;
@@ -32,9 +34,9 @@ public class Restaurant {
 
     private Restaurant() {
         mInstance = this;
-        int diners = 10;
-        int cooks = 2;
-        int tables = 4;
+        diners = 10;
+        cooks = 2;
+        tables = 4;
 
         mTableManager = new TableManager(tables);
         mOrderManager = new OrderManager();
@@ -53,7 +55,7 @@ public class Restaurant {
         @Override
         public void run() {
             for (int i = 0; i < diners; i++) {
-                dinersList.add(new Diner(i + 1, new Order()));
+                dinersList.add(new Diner(i + 1));
             }
 
             /*

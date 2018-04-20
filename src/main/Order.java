@@ -10,6 +10,7 @@ public class Order {
     private int sundaes;
 
     private int currentProcessedTime = 0;
+    private int orderCompleteTime = 0;
 
     public Order() {
         Random random = new Random();
@@ -28,6 +29,10 @@ public class Order {
 
     public synchronized boolean isOrderComplete() {
         return getBurgers() + getFries() + getCokes() + getSundaes() == 0;
+    }
+
+    public synchronized void completeOrder() {
+        orderCompleteTime = currentProcessedTime;
     }
 
     private int getBurgers() {
@@ -68,5 +73,9 @@ public class Order {
 
     public void setCurrentProcessedTime(int currentProcessedTime) {
         this.currentProcessedTime = currentProcessedTime;
+    }
+
+    public int getOrderCompleteTime() {
+        return orderCompleteTime;
     }
 }

@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Random;
+
 public class Diner {
 
     private Diner mInstance;
@@ -7,12 +9,23 @@ public class Diner {
     private Thread mThread;
     private Table assignedTable;
     private Order order;
+    private int arrivalTime;
 
-    public Diner(int id, Order order) {
+    public Diner(int id) {
+        Random random = new Random();
+        mInstance = this;
+        DINER_ID = id;
+        this.order = new Order();
+        arrivalTime = random.nextInt(120);
+        mThread = new Thread(new RunDiner());
+        mThread.start();
+    }
+
+    public Diner(int id, int time, Order order) {
         mInstance = this;
         DINER_ID = id;
         this.order = order;
-
+        arrivalTime = time;
         mThread = new Thread(new RunDiner());
         mThread.start();
     }
@@ -21,25 +34,36 @@ public class Diner {
 
         @Override
         public void run() {
-            // Have a good time.
-
             try {
-                assignedTable = Restaurant.getRestaurant().getTableManager().seatDiner(mInstance);
-                System.out.println("Diner " + mInstance.getDinerId() + " has been seated at Table " + assignedTable.getTableId());
+                // To have a good time.
 
-                Restaurant.getRestaurant().getOrderManager().placeOrder(mInstance);
+                System.out.println("Diner " + mInstance.getDinerId() + " arrived at " + arrivalTime);
+
+                assignedTable = Restaurant.getRestaurant().getTableManager().waitToBeSeated(mInstance, arrivalTime);
+                System.out.println("Diner " + mInstance.getDinerId() + " has been seated at Table " +
+                        assignedTable.getTableId() + " at time " + assignedTable.getTableTime());
+
+                Restaurant.getRestaurant().getOrderManager().placeOrder(mInstance, assignedTable.getTableTime());
+
+                waitOnOrder();
+
+                leaveRestaurant(order.getOrderCompleteTime());
 
             } catch (InterruptedException e) {
-                System.out.println("InterruptedException for Diner " + mInstance.getDinerId() + " while seating.");
+                System.out.println("InterruptedException for Diner " + mInstance.getDinerId());
                 e.printStackTrace();
             }
-
-
         }
     }
 
-    public void placeOrder(Order order) {
+    public synchronized void waitOnOrder() throws InterruptedException{
+        while (!order.isOrderComplete()) {
+            wait();
+        }
+    }
 
+    public synchronized void leaveRestaurant(int time) {
+        Restaurant.getRestaurant().getTableManager().removeDinerFromTable(mInstance, time);
     }
 
     public int getDinerId() {

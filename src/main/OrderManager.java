@@ -11,10 +11,9 @@ public class OrderManager {
         ordersPlaced = new ConcurrentLinkedQueue<>();
     }
 
-    /*
-        Does not need to be synchronized because the queue is thread safe.
-     */
-    public void placeOrder(Diner diner) {
+    public synchronized void placeOrder(Diner diner, int time) {
+        System.out.println("Diner " + diner.getDinerId() + " placed an order at " + time);
         ordersPlaced.offer(diner.getOrder());
+        notifyAll();
     }
 }
