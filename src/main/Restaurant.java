@@ -17,6 +17,7 @@ public class Restaurant {
     private ArrayList<Diner> dinersList = new ArrayList<>();
 
     private TableManager mTableManager;
+    private OrderManager mOrderManager;
 
     public static synchronized Restaurant getRestaurant() {
         if (mInstance == null){
@@ -31,6 +32,18 @@ public class Restaurant {
 
     private Restaurant() {
         mInstance = this;
+        int diners = 10;
+        int cooks = 2;
+        int tables = 4;
+
+        mTableManager = new TableManager(tables);
+        mOrderManager = new OrderManager();
+
+        burgerMachine = new Machine("Burger Machine", 5);
+        friesMachine = new Machine("Fries Machine", 3);
+        cokeMachine = new Machine("Coke Machine", 2);
+        sundaeMachine = new Machine("Sundae Machine", 1);
+
         Thread restaurantThread = new Thread(new RunRestaurant());
         restaurantThread.start();
     }
@@ -39,20 +52,9 @@ public class Restaurant {
 
         @Override
         public void run() {
-            int diners = 10;
-            int cooks = 2;
-            int tables = 4;
-
-            mTableManager = new TableManager(tables);
-
             for (int i = 0; i < diners; i++) {
-                dinersList.add(new Diner(i + 1));
+                dinersList.add(new Diner(i + 1, new Order()));
             }
-
-            burgerMachine = new Machine("Burger Machine", 5);
-            friesMachine = new Machine("Fries Machine", 3);
-            cokeMachine = new Machine("Coke Machine", 2);
-            sundaeMachine = new Machine("Sundae Machine", 1);
 
             /*
             for (int i = 0; i < cooks; i++) {
@@ -68,5 +70,9 @@ public class Restaurant {
 
     public TableManager getTableManager() {
         return mTableManager;
+    }
+
+    public OrderManager getOrderManager() {
+        return mOrderManager;
     }
 }

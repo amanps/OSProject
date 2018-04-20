@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Random;
+
 public class Order {
 
     private int burgers;
@@ -8,6 +10,14 @@ public class Order {
     private int sundaes;
 
     private int currentProcessedTime = 0;
+
+    public Order() {
+        Random random = new Random();
+        this.burgers = random.nextInt(5) + 1;
+        this.fries = random.nextInt(5);
+        this.cokes = random.nextInt(2);
+        this.sundaes = random.nextInt(2);
+    }
 
     public Order(int burgers, int fries, int cokes, int sundaes) {
         this.burgers = burgers;
