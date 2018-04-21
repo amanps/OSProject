@@ -19,11 +19,29 @@ public class OrderManager {
         notifyAll();
     }
 
+    public synchronized void waitOnOrder(Order order) throws InterruptedException {
+        while (!order.isOrderComplete()) {
+            wait();
+        }
+    }
+
+    public synchronized void setOrderCompleted(Order order) {
+//        System.out.println("Order completed. " + toString());
+        order.setOrderCompleted();
+        notifyAll();
+//        System.out.println("Notifying order completed.");
+    }
+
     public synchronized Order getNewOrder() throws InterruptedException{
-        while (ordersPlaced.isEmpty()) {
+        while (isQueueEmpty()) {
             wait();
         }
         return ordersPlaced.poll();
+    }
+
+    public synchronized boolean isQueueEmpty() {
+//        System.out.println("isQueueEmpty");
+        return ordersPlaced.isEmpty();
     }
 
     public synchronized boolean allOrdersServed() {

@@ -6,8 +6,10 @@ public class Machine {
     private boolean isBusy = false;
     private String name;
     private int preparationTime;
+    private final Object MONITOR;
 
     Machine(String name, int preparationTime) {
+        MONITOR = Restaurant.getRestaurant().getMachinesMonitor();
         this.name = name;
         this.preparationTime = preparationTime;
     }
@@ -19,29 +21,35 @@ public class Machine {
         amount of time.
      */
     public synchronized int acquireMachine(Cook cook, int requestTime) throws InterruptedException {
-        while (isBusy) wait();
+        synchronized (MONITOR) {
+            while (isBusy) wait();
 
-        isBusy = true;
+            isBusy = true;
 
-        if (requestTime >= nextAvailableTime) {
-            System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + requestTime);
-            nextAvailableTime = requestTime + preparationTime;
-        } else {
-            System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + nextAvailableTime);
-            nextAvailableTime = nextAvailableTime + preparationTime;
+            if (requestTime >= nextAvailableTime) {
+                System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + requestTime);
+                nextAvailableTime = requestTime + preparationTime;
+            } else {
+                System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + nextAvailableTime);
+                nextAvailableTime = nextAvailableTime + preparationTime;
+            }
+
+            return nextAvailableTime;
         }
-
-        return nextAvailableTime;
     }
 
     public synchronized void releaseMachine() {
-        isBusy = false;
-//        System.out.println("Notifying machine release.");
-        notifyAll();
+        synchronized (MONITOR) {
+            isBusy = false;
+//            System.out.println("Notifying machine release.");
+            notifyAll();
+        }
     }
 
     public synchronized boolean isBusy() {
-        return isBusy;
+        synchronized (MONITOR) {
+            return isBusy;
+        }
     }
 
 }

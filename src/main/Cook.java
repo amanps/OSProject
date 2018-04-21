@@ -54,14 +54,13 @@ public class Cook {
                         }
                     }
 
-                    cookingOrder.setOrderCompleted();
+                    Restaurant.getRestaurant().getOrderManager().setOrderCompleted(cookingOrder);
 
                 } catch (InterruptedException e) {
                     System.out.println("InterruptedException for Cook " + COOK_ID);
                     e.printStackTrace();
                 }
 
-                // 120
 //                if (Restaurant.getRestaurant().getOrderManager().allOrdersServed()) {
 //                    System.out.println("All done.");
 //                    break;
@@ -91,8 +90,10 @@ public class Cook {
         machine.releaseMachine();
     }
 
-    public synchronized void waitForAnOrder() throws InterruptedException{
+    public synchronized void waitForAnOrder() throws InterruptedException {
+//        System.out.println(instance.toString() + " waiting.");
         cookingOrder = Restaurant.getRestaurant().getOrderManager().getNewOrder();
+//        System.out.println(instance.toString() + " done waiting.");
         System.out.println("Cook " + COOK_ID + " is assigned Order " + cookingOrder.getOrderId());
     }
 
@@ -106,5 +107,10 @@ public class Cook {
 
     public int getId() {
         return COOK_ID;
+    }
+
+    @Override
+    public String toString() {
+        return "Cook " + COOK_ID;
     }
 }

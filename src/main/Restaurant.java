@@ -1,6 +1,8 @@
 package main;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Restaurant {
 
@@ -20,6 +22,8 @@ public class Restaurant {
 
     private TableManager mTableManager;
     private OrderManager mOrderManager;
+
+    private final Object machinesMonitor = new Object();
 
     public static synchronized Restaurant getRestaurant() {
         if (mInstance == null){
@@ -46,8 +50,6 @@ public class Restaurant {
         cokeMachine = new Machine("Coke Machine", 2);
         sundaeMachine = new Machine("Sundae Machine", 1);
 
-//        dinersList.add(new Diner(1, 0, new Order(1, 1, 0, 0, 0)));
-
         Thread restaurantThread = new Thread(new RunRestaurant());
         restaurantThread.setName("RestaurantThread");
         restaurantThread.start();
@@ -57,24 +59,45 @@ public class Restaurant {
 
         @Override
         public void run() {
-            dinersList.add(new Diner(1, 0, new Order(1, 1, 0, 2, 0)));
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            String filename = "test.txt";
+            if (!filename.endsWith(".txt")) {
+                System.out.println("Test file provided is not of the .txt format.");
+                System.exit(1);
             }
-            dinersList.add(new Diner(2, 2, new Order(2, 0, 1, 0, 1)));
-//            for (int i = 0; i < diners; i++) {
-//                dinersList.add(new Diner(i + 1));
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
 
-            for (int i = 0; i < cooks; i++) {
-                cooksList.add(new Cook(i + 1));
+            File testFile = new File(filename);
+            try {
+                Scanner scanner = new Scanner(testFile);
+                getRestaurant().diners = Integer.parseInt(scanner.nextLine().trim());
+                getRestaurant().tables = Integer.parseInt(scanner.nextLine().trim());
+                getRestaurant().cooks = Integer.parseInt(scanner.nextLine().trim());
+
+                System.out.println("Restaurant open : " + getRestaurant().diners + " " + getRestaurant().tables + " " + getRestaurant().cooks);
+
+                for (int i = 0; i < getRestaurant().cooks; i++) {
+                    getRestaurant().cooksList.add(new Cook(i + 1));
+                }
+
+                for (int i = 0; i < getRestaurant().diners; i++) {
+                    if (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        line = line.replaceAll("[^0-9]+", " ");
+
+                        String[] lineArray = line.split(" ");
+                        int inTime = Integer.parseInt(lineArray[0]);
+                        int burgers = Integer.parseInt(lineArray[1]);
+                        int fries = Integer.parseInt(lineArray[2]);
+                        int cokes = Integer.parseInt(lineArray[3]);
+                        int sundaes = Integer.parseInt(lineArray[4]);
+                        getRestaurant().dinersList.add(new Diner(i + 1, inTime,
+                                new Order(i + 1, burgers, fries, cokes, sundaes)));
+                        Thread.sleep(1000);
+                    }
+                }
+
+            } catch (Exception e) {
+                System.out.println("Exception in main.");
+                e.printStackTrace();
             }
         }
     }
@@ -105,5 +128,9 @@ public class Restaurant {
 
     public Machine getSundaeMachine() {
         return sundaeMachine;
+    }
+
+    public Object getMachinesMonitor() {
+        return machinesMonitor;
     }
 }

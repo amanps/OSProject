@@ -63,8 +63,8 @@ public class Diner {
         }
     }
 
-    public synchronized void waitOnOrder() throws InterruptedException{
-        order.waitOnOrder();
+    public synchronized void waitOnOrder() throws InterruptedException {
+        Restaurant.getRestaurant().getOrderManager().waitOnOrder(order);
     }
 
     public synchronized void leaveRestaurant(int time) {

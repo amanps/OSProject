@@ -37,10 +37,9 @@ public class Order {
     }
 
     public synchronized void setOrderCompleted() {
-        System.out.println("Order completed. " + toString());
+//        System.out.println("Order completed. " + toString());
         orderCompleteTime = currentTime;
 //        System.out.println("Notifying order completed.");
-        notifyAll();
     }
 
     public synchronized void waitOnOrder() throws InterruptedException{
