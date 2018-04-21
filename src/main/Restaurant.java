@@ -74,8 +74,8 @@ public class Restaurant {
             System.out.println("Restaurant open : " + getRestaurant().diners + " " +
                     getRestaurant().tables + " " + getRestaurant().cooks);
 
-            mTableManager = new TableManager(tables);
-            mOrderManager = new OrderManager();
+            mTableManager = new TableManager(getRestaurant().tables);
+            mOrderManager = new OrderManager(getRestaurant().diners);
 
             for (int i = 0; i < getRestaurant().cooks; i++) {
                 getRestaurant().cooksList.add(new Cook(i + 1));
@@ -107,6 +107,11 @@ public class Restaurant {
 
     public synchronized void onDinerSeated() {
         notifyAll();
+    }
+
+    public synchronized void shutdownRestaurant() {
+        System.out.println("\nShutting down restaurant.");
+        System.exit(0);
     }
 
     public static void main(String[] args) {

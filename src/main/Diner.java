@@ -70,6 +70,9 @@ public class Diner {
 
     public synchronized void leaveRestaurant(int time) {
         Restaurant.getRestaurant().getTableManager().removeDinerFromTable(mInstance, time);
+        if (Restaurant.getRestaurant().getOrderManager().allOrdersServed()) {
+            Restaurant.getRestaurant().shutdownRestaurant();
+        }
     }
 
     public int getDinerId() {

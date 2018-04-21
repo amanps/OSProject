@@ -6,9 +6,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class OrderManager {
 
     private Queue<Order> ordersPlaced;
+    private int orders;
+    private int ordersServed;
 
-    public OrderManager() {
+    public OrderManager(int orders) {
         ordersPlaced = new ConcurrentLinkedQueue<>();
+        this.orders = orders;
     }
 
     public synchronized void placeOrder(Diner diner, int time) {
@@ -27,6 +30,7 @@ public class OrderManager {
 
     public synchronized void setOrderCompleted(Order order) {
 //        System.out.println("Order completed. " + toString());
+        ordersServed += 1;
         order.setOrderCompleted();
         notifyAll();
 //        System.out.println("Notifying order completed.");
@@ -45,6 +49,6 @@ public class OrderManager {
     }
 
     public synchronized boolean allOrdersServed() {
-        return ordersPlaced.isEmpty();
+        return ordersServed == orders;
     }
 }
