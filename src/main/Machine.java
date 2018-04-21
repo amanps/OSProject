@@ -20,9 +20,9 @@ public class Machine {
         because this part of the order will take requestTime + prepTime
         amount of time.
      */
-    public synchronized int acquireMachine(Cook cook, int requestTime) throws InterruptedException {
+    public int acquireMachine(Cook cook, int requestTime) throws InterruptedException {
         synchronized (MONITOR) {
-            while (isBusy) wait();
+            while (isBusy) MONITOR.wait();
 
             isBusy = true;
 
@@ -38,15 +38,15 @@ public class Machine {
         }
     }
 
-    public synchronized void releaseMachine() {
+    public void releaseMachine() {
         synchronized (MONITOR) {
             isBusy = false;
 //            System.out.println("Notifying machine release.");
-            notifyAll();
+            MONITOR.notifyAll();
         }
     }
 
-    public synchronized boolean isBusy() {
+    public boolean isBusy() {
         synchronized (MONITOR) {
             return isBusy;
         }
