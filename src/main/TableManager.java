@@ -34,9 +34,9 @@ public class TableManager {
         Table assignedTable = diner.getAssignedTable();
         if (assignedTable == null)
             return;
-        System.out.println("Diner " + diner.getDinerId() + " got up from Table " + assignedTable + " at " + time);
         availableTables.add(assignedTable);
         diner.setAssignedTable(null);
+//        System.out.println("Notifying remove diner from table.");
         notifyAll();
     }
 }

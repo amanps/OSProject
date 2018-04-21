@@ -1,7 +1,5 @@
 package main;
 
-import main.Cook;
-
 public class Machine {
 
     private int nextAvailableTime = 0;
@@ -23,15 +21,27 @@ public class Machine {
     public synchronized int acquireMachine(Cook cook, int requestTime) throws InterruptedException {
         while (isBusy) wait();
 
-        System.out.println("main.Cook " + cook.getId() + " acquired " + name);
+        isBusy = true;
 
         if (requestTime >= nextAvailableTime) {
+            System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + requestTime);
             nextAvailableTime = requestTime + preparationTime;
         } else {
+            System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + nextAvailableTime);
             nextAvailableTime = nextAvailableTime + preparationTime;
         }
 
         return nextAvailableTime;
+    }
+
+    public synchronized void releaseMachine() {
+        isBusy = false;
+//        System.out.println("Notifying machine release.");
+        notifyAll();
+    }
+
+    public synchronized boolean isBusy() {
+        return isBusy;
     }
 
 }

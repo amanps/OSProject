@@ -10,14 +10,16 @@ public class Diner {
     private Table assignedTable;
     private Order order;
     private int arrivalTime;
+    private int EATING_TIME = 30;
 
     public Diner(int id) {
         Random random = new Random();
         mInstance = this;
         DINER_ID = id;
-        this.order = new Order();
-        arrivalTime = random.nextInt(120);
+        this.order = new Order(id);
+        arrivalTime = random.nextInt(30);
         mThread = new Thread(new RunDiner());
+        mThread.setName("Diner" + id);
         mThread.start();
     }
 
@@ -37,7 +39,8 @@ public class Diner {
             try {
                 // To have a good time.
 
-                System.out.println("Diner " + mInstance.getDinerId() + " arrived at " + arrivalTime);
+                System.out.println("Diner " + mInstance.getDinerId() + " arrived at " + arrivalTime +
+                        " with Order : " + order.toString());
 
                 assignedTable = Restaurant.getRestaurant().getTableManager().waitToBeSeated(mInstance, arrivalTime);
                 System.out.println("Diner " + mInstance.getDinerId() + " has been seated at Table " +
@@ -46,8 +49,12 @@ public class Diner {
                 Restaurant.getRestaurant().getOrderManager().placeOrder(mInstance, assignedTable.getTableTime());
 
                 waitOnOrder();
+                System.out.println("Diner " + mInstance.getDinerId() + " got food at " + order.getOrderCompleteTime());
 
-                leaveRestaurant(order.getOrderCompleteTime());
+                int leavingTime = order.getOrderCompleteTime() + EATING_TIME;
+                System.out.println("Diner " + mInstance.getDinerId() + " got up from Table " +
+                        assignedTable.getTableId() + " at " + leavingTime);
+                leaveRestaurant(leavingTime);
 
             } catch (InterruptedException e) {
                 System.out.println("InterruptedException for Diner " + mInstance.getDinerId());
@@ -57,9 +64,7 @@ public class Diner {
     }
 
     public synchronized void waitOnOrder() throws InterruptedException{
-        while (!order.isOrderComplete()) {
-            wait();
-        }
+        order.waitOnOrder();
     }
 
     public synchronized void leaveRestaurant(int time) {

@@ -15,7 +15,7 @@ public class Restaurant {
     private Machine cokeMachine;
     private Machine sundaeMachine;
 
-    private ArrayList<Cook> cooksList;
+    private ArrayList<Cook> cooksList = new ArrayList<>();
     private ArrayList<Diner> dinersList = new ArrayList<>();
 
     private TableManager mTableManager;
@@ -34,9 +34,9 @@ public class Restaurant {
 
     private Restaurant() {
         mInstance = this;
-        diners = 10;
+        diners = 2;
         cooks = 2;
-        tables = 4;
+        tables = 1;
 
         mTableManager = new TableManager(tables);
         mOrderManager = new OrderManager();
@@ -46,7 +46,10 @@ public class Restaurant {
         cokeMachine = new Machine("Coke Machine", 2);
         sundaeMachine = new Machine("Sundae Machine", 1);
 
+//        dinersList.add(new Diner(1, 0, new Order(1, 1, 0, 0, 0)));
+
         Thread restaurantThread = new Thread(new RunRestaurant());
+        restaurantThread.setName("RestaurantThread");
         restaurantThread.start();
     }
 
@@ -54,15 +57,25 @@ public class Restaurant {
 
         @Override
         public void run() {
-            for (int i = 0; i < diners; i++) {
-                dinersList.add(new Diner(i + 1));
+            dinersList.add(new Diner(1, 0, new Order(1, 1, 0, 2, 0)));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            dinersList.add(new Diner(2, 2, new Order(2, 0, 1, 0, 1)));
+//            for (int i = 0; i < diners; i++) {
+//                dinersList.add(new Diner(i + 1));
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
 
-            /*
             for (int i = 0; i < cooks; i++) {
                 cooksList.add(new Cook(i + 1));
             }
-            */
         }
     }
 
@@ -76,5 +89,21 @@ public class Restaurant {
 
     public OrderManager getOrderManager() {
         return mOrderManager;
+    }
+
+    public Machine getBurgerMachine() {
+        return burgerMachine;
+    }
+
+    public Machine getFriesMachine() {
+        return friesMachine;
+    }
+
+    public Machine getCokeMachine() {
+        return cokeMachine;
+    }
+
+    public Machine getSundaeMachine() {
+        return sundaeMachine;
     }
 }
