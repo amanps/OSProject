@@ -27,10 +27,12 @@ public class Machine {
             isBusy = true;
 
             if (requestTime >= nextAvailableTime) {
-                System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + requestTime);
+                System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + requestTime +
+                        " for Order " + cook.getCookingOrder().getOrderId());
                 nextAvailableTime = requestTime + preparationTime;
             } else {
-                System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + nextAvailableTime);
+                System.out.println("Cook " + cook.getId() + " acquired " + name + " at time " + nextAvailableTime +
+                        " for Order " + cook.getCookingOrder().getOrderId());
                 nextAvailableTime = nextAvailableTime + preparationTime;
             }
 
