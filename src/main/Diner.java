@@ -45,6 +45,7 @@ public class Diner {
                 assignedTable = Restaurant.getRestaurant().getTableManager().waitToBeSeated(mInstance, arrivalTime);
                 System.out.println("Diner " + mInstance.getDinerId() + " has been seated at Table " +
                         assignedTable.getTableId() + " at time " + assignedTable.getTableTime());
+                Restaurant.getRestaurant().onDinerSeated();
 
                 Restaurant.getRestaurant().getOrderManager().placeOrder(mInstance, assignedTable.getTableTime());
 

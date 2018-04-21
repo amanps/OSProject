@@ -38,12 +38,6 @@ public class Restaurant {
 
     private Restaurant() {
         mInstance = this;
-        diners = 2;
-        cooks = 2;
-        tables = 1;
-
-        mTableManager = new TableManager(tables);
-        mOrderManager = new OrderManager();
 
         burgerMachine = new Machine("Burger Machine", 5);
         friesMachine = new Machine("Fries Machine", 3);
@@ -59,47 +53,60 @@ public class Restaurant {
 
         @Override
         public void run() {
-            String filename = "test.txt";
-            if (!filename.endsWith(".txt")) {
-                System.out.println("Test file provided is not of the .txt format.");
-                System.exit(1);
-            }
-
-            File testFile = new File(filename);
-            try {
-                Scanner scanner = new Scanner(testFile);
-                getRestaurant().diners = Integer.parseInt(scanner.nextLine().trim());
-                getRestaurant().tables = Integer.parseInt(scanner.nextLine().trim());
-                getRestaurant().cooks = Integer.parseInt(scanner.nextLine().trim());
-
-                System.out.println("Restaurant open : " + getRestaurant().diners + " " + getRestaurant().tables + " " + getRestaurant().cooks);
-
-                for (int i = 0; i < getRestaurant().cooks; i++) {
-                    getRestaurant().cooksList.add(new Cook(i + 1));
-                }
-
-                for (int i = 0; i < getRestaurant().diners; i++) {
-                    if (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
-                        line = line.replaceAll("[^0-9]+", " ");
-
-                        String[] lineArray = line.split(" ");
-                        int inTime = Integer.parseInt(lineArray[0]);
-                        int burgers = Integer.parseInt(lineArray[1]);
-                        int fries = Integer.parseInt(lineArray[2]);
-                        int cokes = Integer.parseInt(lineArray[3]);
-                        int sundaes = Integer.parseInt(lineArray[4]);
-                        getRestaurant().dinersList.add(new Diner(i + 1, inTime,
-                                new Order(i + 1, burgers, fries, cokes, sundaes)));
-                        Thread.sleep(1000);
-                    }
-                }
-
-            } catch (Exception e) {
-                System.out.println("Exception in main.");
-                e.printStackTrace();
-            }
+            runRestaurant();
         }
+    }
+
+    public synchronized void runRestaurant() {
+        String filename = "test2.txt";
+        if (!filename.endsWith(".txt")) {
+            System.out.println("Test file provided is not of the .txt format.");
+            System.exit(1);
+        }
+
+        File testFile = new File(filename);
+        try {
+            Scanner scanner = new Scanner(testFile);
+            getRestaurant().diners = Integer.parseInt(scanner.nextLine().trim());
+            getRestaurant().tables = Integer.parseInt(scanner.nextLine().trim());
+            getRestaurant().cooks = Integer.parseInt(scanner.nextLine().trim());
+
+            System.out.println("Restaurant open : " + getRestaurant().diners + " " +
+                    getRestaurant().tables + " " + getRestaurant().cooks);
+
+            mTableManager = new TableManager(tables);
+            mOrderManager = new OrderManager();
+
+            for (int i = 0; i < getRestaurant().cooks; i++) {
+                getRestaurant().cooksList.add(new Cook(i + 1));
+            }
+
+            for (int i = 0; i < getRestaurant().diners; i++) {
+                if (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    line = line.replaceAll("[^0-9]+", " ");
+
+                    String[] lineArray = line.split(" ");
+                    int inTime = Integer.parseInt(lineArray[0]);
+                    int burgers = Integer.parseInt(lineArray[1]);
+                    int fries = Integer.parseInt(lineArray[2]);
+                    int cokes = Integer.parseInt(lineArray[3]);
+                    int sundaes = Integer.parseInt(lineArray[4]);
+                    getRestaurant().dinersList.add(new Diner(i + 1, inTime,
+                            new Order(i + 1, burgers, fries, cokes, sundaes)));
+                    // wait for this diner to be seated before processing next.
+                    wait();
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception in main.");
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void onDinerSeated() {
+        notifyAll();
     }
 
     public static void main(String[] args) {
