@@ -24,7 +24,7 @@ public class Cook {
 
         @Override
         public void run() {
-            while (true) {
+            while (!Restaurant.getRestaurant().getOrderManager().allOrdersServed()) {
                 try {
                     waitForAnOrder();
 
@@ -61,10 +61,6 @@ public class Cook {
                     e.printStackTrace();
                 }
 
-//                if (Restaurant.getRestaurant().getOrderManager().allOrdersServed()) {
-//                    System.out.println("All done.");
-//                    break;
-//                }
             }
         }
     }
